@@ -1,0 +1,198 @@
+CREATE DATABASE BusinessDB;
+GO
+
+USE BusinessDB;
+GO
+
+-- Создание таблицы Services
+CREATE TABLE Services (
+    ServiceID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Description NVARCHAR(MAX),
+    Price DECIMAL(10, 2) NOT NULL,
+    Duration INT NOT NULL
+);
+
+-- Создание таблицы Products
+CREATE TABLE Products (
+    ProductID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Description NVARCHAR(MAX),
+    Price DECIMAL(10, 2) NOT NULL,
+    QuantityInStock INT NOT NULL
+);
+
+-- Создание таблицы Suppliers
+CREATE TABLE Suppliers (
+    SupplierID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    ContactInfo NVARCHAR(MAX),
+    Type NVARCHAR(50) NOT NULL
+);
+
+-- Создание таблицы Employees
+CREATE TABLE Employees (
+    EmployeeID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Position NVARCHAR(255) NOT NULL,
+    ContactInfo NVARCHAR(MAX),
+    WorkSchedule NVARCHAR(MAX)
+);
+
+-- Создание таблицы CashRegisters
+CREATE TABLE CashRegisters (
+    CashRegisterID INT IDENTITY(1,1) PRIMARY KEY,
+    Number NVARCHAR(50) NOT NULL,
+    Location NVARCHAR(255) NOT NULL
+);
+
+-- Создание таблицы Orders
+CREATE TABLE Orders (
+    OrderID INT IDENTITY(1,1) PRIMARY KEY,
+    OrderDate DATETIME NOT NULL,
+    Status NVARCHAR(50) NOT NULL,
+    CustomerID INT NOT NULL,
+    EmployeeID INT,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID)
+);
+
+-- Создание таблицы Deliveries
+CREATE TABLE Deliveries (
+    DeliveryID INT IDENTITY(1,1) PRIMARY KEY,
+    DeliveryDate DATETIME NOT NULL,
+    SupplierID INT NOT NULL,
+    TotalCost DECIMAL(10, 2) NOT NULL,
+    Status NVARCHAR(50) NOT NULL,
+    FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID)
+);
+
+-- Создание таблицы DeliveryItems
+CREATE TABLE DeliveryItems (
+    DeliveryItemID INT IDENTITY(1,1) PRIMARY KEY,
+    DeliveryID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Quantity INT NOT NULL,
+    FOREIGN KEY (DeliveryID) REFERENCES Deliveries(DeliveryID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- Создание таблицы Inventory
+CREATE TABLE Inventory (
+    InventoryID INT IDENTITY(1,1) PRIMARY KEY,
+    ProductID INT NOT NULL,
+    QuantityInStock INT NOT NULL,
+    LastUpdate DATETIME NOT NULL,
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- Создание таблицы InventoryCheck
+CREATE TABLE InventoryCheck (
+    InventoryCheckID INT IDENTITY(1,1) PRIMARY KEY,
+    CheckDate DATETIME NOT NULL,
+    ProductID INT NOT NULL,
+    CountedQuantity INT NOT NULL,
+    Discrepancy INT NOT NULL,
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- Создание таблицы Sales
+CREATE TABLE Sales (
+    SaleID INT IDENTITY(1,1) PRIMARY KEY,
+    SaleDate DATETIME NOT NULL,
+    CustomerID INT NOT NULL,
+    ServiceID INT,
+    ProductID INT,
+    Amount DECIMAL(10, 2) NOT NULL,
+    CashRegisterID INT NOT NULL,
+    PaymentMethod NVARCHAR(50) NOT NULL,
+    FOREIGN KEY (ServiceID) REFERENCES Services(ServiceID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
+    FOREIGN KEY (CashRegisterID) REFERENCES CashRegisters(CashRegisterID)
+);
+
+-- Создание таблицы Customers
+CREATE TABLE Customers (
+    CustomerID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    ContactInfo NVARCHAR(MAX)
+);
+
+-- Вставка данных в таблицу Services
+INSERT INTO Services (Name, Description, Price, Duration)
+VALUES
+('Service1', 'Описание услуги 1', 100.00, 60),
+('Service2', 'Описание услуги 2', 200.00, 90),
+('Service3', 'Описание услуги 3', 150.00, 120);
+
+-- Вставка данных в таблицу Products
+INSERT INTO Products (Name, Description, Price, QuantityInStock)
+VALUES
+('Product1', 'Описание товара 1', 50.00, 100),
+('Product2', 'Описание товара 2', 30.00, 200),
+('Product3', 'Описание товара 3', 20.00, 150);
+
+-- Вставка данных в таблицу Suppliers
+INSERT INTO Suppliers (Name, ContactInfo, Type)
+VALUES
+('Supplier1', 'Контактная информация 1', 'Тип1'),
+('Supplier2', 'Контактная информация 2', 'Тип2'),
+('Supplier3', 'Контактная информация 3', 'Тип3');
+
+-- Вставка данных в таблицу Employees
+INSERT INTO Employees (Name, Position, ContactInfo, WorkSchedule)
+VALUES
+('Employee1', 'Менеджер', 'Контактная информация 1', 'Пон-Пт 9:00-18:00'),
+('Employee2', 'Кассир', 'Контактная информация 2', 'Пон-Пт 10:00-19:00'),
+('Employee3', 'Работник склада', 'Контактная информация 3', 'Пон-Пт 8:00-17:00');
+
+-- Вставка данных в таблицу CashRegisters
+INSERT INTO CashRegisters (Number, Location)
+VALUES
+('CR001', 'Точка продажи 1'),
+('CR002', 'Точка продажи 2');
+
+-- Вставка данных в таблицу Orders
+INSERT INTO Orders (OrderDate, Status, CustomerID, EmployeeID, TotalAmount)
+VALUES
+('2024-12-01', 'Завершен', 1, 1, 250.00),
+('2024-12-02', 'Ожидает', 2, 2, 350.00);
+
+-- Вставка данных в таблицу Deliveries
+INSERT INTO Deliveries (DeliveryDate, SupplierID, TotalCost, Status)
+VALUES
+('2024-12-01', 1, 500.00, 'Прибыло'),
+('2024-12-02', 2, 600.00, 'Ожидает');
+
+-- Вставка данных в таблицу DeliveryItems
+INSERT INTO DeliveryItems (DeliveryID, ProductID, Quantity)
+VALUES
+(1, 1, 50),
+(1, 2, 30),
+(2, 2, 20);
+
+-- Вставка данных в таблицу Inventory
+INSERT INTO Inventory (ProductID, QuantityInStock, LastUpdate)
+VALUES
+(1, 50, '2024-12-01'),
+(2, 30, '2024-12-02'),
+(3, 20, '2024-12-03');
+
+-- Вставка данных в таблицу InventoryCheck
+INSERT INTO InventoryCheck (CheckDate, ProductID, CountedQuantity, Discrepancy)
+VALUES
+('2024-12-01', 1, 50, 0),
+('2024-12-02', 2, 30, 0),
+('2024-12-03', 3, 20, 0);
+
+-- Вставка данных в таблицу Sales
+INSERT INTO Sales (SaleDate, CustomerID, ServiceID, ProductID, Amount, CashRegisterID, PaymentMethod)
+VALUES
+('2024-12-01', 1, 1, 1, 250.00, 1, 'Кредитная карта'),
+('2024-12-02', 2, 2, 2, 350.00, 2, 'Наличные');
+
+-- Вставка данных в таблицу Customers
+INSERT INTO Customers (Name, ContactInfo)
+VALUES
+('Customer1', 'Контактная информация 1'),
+('Customer2', 'Контактная информация 2');
